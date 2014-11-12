@@ -1,14 +1,11 @@
 #-*- coding: utf-8 -*-
 import urllib
-import sys
 from bs4 import BeautifulSoup
 
-#reload(sys)
-#sys.setdefaultencoding('utf-8')
 
-#html = urllib.urlopen('http://m.search.naver.com/search.naver?query=')
-#soup = BeautifulSoup(html, 'lxml')
+html = urllib.urlopen('http://m.search.naver.com/search.naver?query=')
+soup = BeautifulSoup(html)
 
-#print(soup.prettify().encode('utf-8'))
+print(soup.prettify())
 
-print '홍홍  aa'
+print 'ȫȫ  aa'
