@@ -8,10 +8,7 @@ import urllib, urllib2
 
 import json
 
-
-# import sys
-# reload(sys)
-# sys.setdefaultencoding('utf-8')
+import MySQLmodule as mdb
 
 
 #http://m.search.naver.com/search.naver?query=
@@ -22,6 +19,9 @@ IssueObj 	  = ''   #실시간 이슈
 SisaIssueObj  = ''   # 뉴스
 EnterNewsObj  = ''   # 연예
 SportsNewsObj = ''   # 스포츠
+
+ymd  = ''
+time = ''
 
 # Site Data 긁어 오기
 def getHTMLData():
@@ -49,6 +49,8 @@ def makeJSONStructure(data):
 	data = re.sub(r'type:',' "type":',data)
 	data = re.sub(r'value:',' "value":',data)
 
+	data = re.sub(r'"new"','"="',data)
+
 	return data
 
 
@@ -61,25 +63,53 @@ def getData(str, HTMLStr):
 	return data
 
 
+# Add JSON element
+def addData(key, data, json):
+	for i in range(0, len(json)):
+		json[i][key] = data
+
+	return json
+
+
+# get HTML document
 HTMLStr = getHTMLData()
 
 
+# get JSON data each search category
 IssueObj = getData('IssueObj', HTMLStr)
 SisaIssueObj = getData('SisaIssueObj', HTMLStr)
 EnterNewsObj = getData('EnterNewsObj', HTMLStr)
 SportsNewsObj = getData('SportsNewsObj', HTMLStr)
 
 
-for i in IssueObj:
-	print i['keyword']+' '+i['type']+' '+i['value']
+# 사이트, 검색 종류 json에 추가
+IssueObj = addData('site_se', '1', IssueObj)
+IssueObj = addData('search_se', '1', IssueObj)
 
-for i in SisaIssueObj:
-	print i['keyword']+' '+i['type']+' '+i['value']
+SisaIssueObj = addData('site_se', '1', SisaIssueObj)
+SisaIssueObj = addData('search_se', '2', SisaIssueObj)
 
-for i in EnterNewsObj:
-	print i['keyword']+' '+i['type']+' '+i['value']
+EnterNewsObj = addData('site_se', '1', EnterNewsObj)
+EnterNewsObj = addData('search_se', '3', EnterNewsObj)
 
-for i in SportsNewsObj:
-	print i['keyword']+' '+i['type']+' '+i['value']
+SportsNewsObj = addData('site_se', '1', SportsNewsObj)
+SportsNewsObj = addData('search_se', '4', SportsNewsObj)
 
 
+
+# 실시간 검색 일자 파싱
+data = javascriptParsing('issueTime', HTMLStr)
+
+data = re.sub(r'[\'\.\:]', '', data)
+
+data = data.split()
+
+ymd  = '2014' + data[0]
+time = data[1]
+
+
+# Insert into DB
+mdb.insertJSONwithDate(IssueObj, ymd, time)
+mdb.insertJSONwithDate(SisaIssueObj, ymd, time)
+mdb.insertJSONwithDate(EnterNewsObj, ymd, time)
+mdb.insertJSONwithDate(SportsNewsObj, ymd, time)
