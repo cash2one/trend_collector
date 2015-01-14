@@ -104,7 +104,7 @@ data = re.sub(r'[\'\.\:]', '', data)
 
 data = data.split()
 
-ymd  = '2014' + data[0]
+ymd  = '2015' + data[0]
 time = data[1]
 
 
@@ -113,3 +113,6 @@ mdb.insertJSONwithDate(IssueObj, ymd, time)
 mdb.insertJSONwithDate(SisaIssueObj, ymd, time)
 mdb.insertJSONwithDate(EnterNewsObj, ymd, time)
 mdb.insertJSONwithDate(SportsNewsObj, ymd, time)
+
+# Insert Into DM Table
+mdb.insertDMTrend(ymd)
